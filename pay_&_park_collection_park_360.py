@@ -12,7 +12,7 @@ uploaded_file = st.file_uploader("Upload Parking Report Excel File", type=["xlsx
 if uploaded_file is not None:
     df = pd.read_excel(uploaded_file)
 else:
-    df = pd.read_excel(r"C:\Users\KRISHA\Desktop\PARK 360\Paymet data\Pay_Park_Collection_Report.xlsx")
+    st.stop()
 
 # -----------------------------
 # Sidebar Filters
