@@ -34,7 +34,7 @@ st.subheader("📊 Key Metrics")
 
 col1, col2, col3, col4 = st.columns(4)
 
-total_revenue = df["Total Amount"].sum()
+total_revenue = df["Amount"].sum()
 total_initial = df["Initial Amount"].sum()
 total_extra = df["Extra Amount"].sum()
 total_transactions = len(df)
