@@ -7,14 +7,12 @@ st.set_page_config(page_title="Parking Analytics Dashboard", layout="wide")
 
 st.title("🚗 Parking Management Analytics Dashboard")
 
-# File Upload
-uploaded_file = st.file_uploader(""C:\Users\KRISHA\Desktop\PARK 360\Paymet data\Pay_Park_Collection_Report.xlsx"", type=["xlsx"])
+uploaded_file = st.file_uploader("Upload Parking Report Excel File", type=["xlsx"])
 
-if uploaded_file:
-    df = pd.read_excel("C:\Users\KRISHA\Desktop\PARK 360\Paymet data\Pay_Park_Collection_Report.xlsx")
+if uploaded_file is not None:
+    df = pd.read_excel(uploaded_file)
 else:
-    st.info(""C:\Users\KRISHA\Desktop\PARK 360\Paymet data\Pay_Park_Collection_Report.xlsx"")
-    df = pd.read_excel(""C:\Users\KRISHA\Desktop\PARK 360\Paymet data\Pay_Park_Collection_Report.xlsx"")
+    df = pd.read_excel(r"C:\Users\KRISHA\Desktop\PARK 360\Paymet data\Pay_Park_Collection_Report.xlsx")
 
 # -----------------------------
 # Sidebar Filters
