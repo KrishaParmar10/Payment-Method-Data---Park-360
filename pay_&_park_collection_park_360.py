@@ -100,7 +100,7 @@ col1, col2 = st.columns(2)
 
 # Revenue by Vehicle Type
 with col1:
-    st.subheader("💰 Revenue by Vehicle Type")
+    st.subheader("Revenue by Vehicle Type")
     rev_vehicle = df.groupby("Vehicletype")["Amount"].sum().reset_index()
     fig1 = px.bar(
         rev_vehicle,
@@ -112,7 +112,7 @@ with col1:
 
 # Payment Status Distribution
 with col2:
-    st.subheader("💳 Payment Status Distribution")
+    st.subheader("Payment Status Distribution")
     pay_status = df["Paymentstatus Out"].value_counts().reset_index()
     pay_status.columns = ["Paymentstatus Out", "Count"]
     fig2 = px.pie(
@@ -134,7 +134,7 @@ entry_hourly = df["Entry Hour"].value_counts().sort_index()
 exit_hourly = df["Exit Hour"].value_counts().sort_index()
 
 with col3:
-    st.subheader("⏰ Hourly Entries")
+    st.subheader("Hourly Entries")
     fig3 = px.bar(
         x=entry_hourly.index,
         y=entry_hourly.values,
@@ -143,7 +143,7 @@ with col3:
     st.plotly_chart(fig3, use_container_width=True)
 
 with col4:
-    st.subheader("🚪 Hourly Exits")
+    st.subheader("Hourly Exits")
     fig4 = px.bar(
         x=exit_hourly.index,
         y=exit_hourly.values,
