@@ -7,7 +7,17 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded"
 )
-st.title("Parking Management Analytics Dashboard")
+
+st.set_page_config(
+    page_title="Test",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
+
+st.sidebar.title("Filters")
+st.sidebar.selectbox("Test Filter", [1,2,3])
+
+st.write("Main Page")
 
 # -----------------------------
 # File Upload
