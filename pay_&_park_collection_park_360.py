@@ -2,8 +2,11 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
-st.set_page_config(page_title="Parking Analytics Dashboard", layout="wide")
-
+st.set_page_config(
+    page_title="Parking Analytics Dashboard",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
 st.title("Parking Management Analytics Dashboard")
 
 # -----------------------------
