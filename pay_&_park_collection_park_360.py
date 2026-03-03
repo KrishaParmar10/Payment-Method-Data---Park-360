@@ -2,90 +2,85 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
+# -----------------------------
+# Page Config
+# -----------------------------
 st.set_page_config(
     page_title="Parking Analytics Dashboard",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-st.set_page_config(
-    page_title="Test",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
-
-st.sidebar.title("Filters")
-st.sidebar.selectbox("Test Filter", [1,2,3])
-
-st.write("Main Page")
+st.title("Parking Management Analytics Dashboard")
 
 # -----------------------------
 # File Upload
 # -----------------------------
 uploaded_file = st.file_uploader("Upload Parking Report Excel File", type=["xlsx"])
 
+st.sidebar.title("Filters")
+
 if uploaded_file is None:
     st.info("Please upload an Excel file to continue.")
     st.stop()
 
+# -----------------------------
 # Read File
+# -----------------------------
 df = pd.read_excel(uploaded_file)
-
-# Clean column names
 df.columns = df.columns.str.strip()
 
+# Convert datetime
+df["Intime"] = pd.to_datetime(df["Intime"], errors="coerce")
+df["Outtime"] = pd.to_datetime(df["Outtime"], errors="coerce")
+
 # -----------------------------
-# Sidebar Filters
+# FILTERS
 # -----------------------------
-st.sidebar.header("Filters")
 
 # Vehicle Type Filter
-if "Vehicle Type" in df.columns:
-    vehicle_options = df["Vehicle Type"].dropna().unique()
-    selected_vehicle = st.sidebar.multiselect(
-        "Select Vehicle Type",
-        options=vehicle_options,
-        default=vehicle_options
-    )
-    df = df[df["Vehicle Type"].isin(selected_vehicle)]
+vehicle_options = df["Vehicletype"].dropna().unique()
+selected_vehicle = st.sidebar.multiselect(
+    "Select Vehicle Type",
+    options=vehicle_options,
+    default=vehicle_options
+)
+df = df[df["Vehicletype"].isin(selected_vehicle)]
 
 # Payment Status Filter
-if "Payment Status" in df.columns:
-    payment_options = df["Paymentstatus Out"].dropna().unique()
-    selected_payment = st.sidebar.multiselect(
-        "Select Payment Status",
-        options=payment_options,
-        default=payment_options
-    )
-    df = df[df["Paymentstatus Out"].isin(selected_payment)]
+payment_options = df["Paymentstatus Out"].dropna().unique()
+selected_payment = st.sidebar.multiselect(
+    "Select Payment Status",
+    options=payment_options,
+    default=payment_options
+)
+df = df[df["Paymentstatus Out"].isin(selected_payment)]
 
 # Date Filter
-if "Entry Time" in df.columns:
-    df["Entry Time"] = pd.to_datetime(df["Intime"], errors="coerce")
-    min_date = df["Entry Time"].min()
-    max_date = df["Entry Time"].max()
+min_date = df["Intime"].min()
+max_date = df["Intime"].max()
 
-    date_range = st.sidebar.date_input(
-        "Select Date Range",
-        [min_date, max_date]
-    )
+date_range = st.sidebar.date_input(
+    "Select Date Range",
+    [min_date, max_date]
+)
 
-    if len(date_range) == 2:
-        df = df[
-            (df["Entry Time"].dt.date >= date_range[0]) &
-            (df["Entry Time"].dt.date <= date_range[1])
-        ]
+if len(date_range) == 2:
+    df = df[
+        (df["Intime"].dt.date >= date_range[0]) &
+        (df["Intime"].dt.date <= date_range[1])
+    ]
 
 # -----------------------------
-# KPI Section
+# KPI SECTION
 # -----------------------------
 st.subheader("Key Metrics")
 
 col1, col2, col3, col4 = st.columns(4)
 
-total_revenue = df["Amount"].sum() if "Amount" in df.columns else 0
-total_initial = df["Initial Amount"].sum() if "Initial Amount" in df.columns else 0
-total_extra = df["Extra Amount"].sum() if "Extra Amount" in df.columns else 0
+total_revenue = df["Amount"].sum()
+total_initial = df["Initial Amount"].sum()
+total_extra = df["Extra Amount"].sum()
 total_transactions = len(df)
 
 col1.metric("Total Revenue", f"₹{total_revenue:,.2f}")
@@ -98,56 +93,44 @@ st.markdown("---")
 # -----------------------------
 # Revenue by Vehicle Type
 # -----------------------------
-if "Vehicle Type" in df.columns and "Total Amount" in df.columns:
-    st.subheader("Revenue by Vehicle Type")
-    rev_vehicle = df.groupby("Vehicle Type")["Amount"].sum().reset_index()
-    fig1 = px.bar(rev_vehicle, x="Vehicle Type", y="Total Amount", color="Vehicle Type")
-    st.plotly_chart(fig1, use_container_width=True)
+st.subheader("Revenue by Vehicle Type")
+rev_vehicle = df.groupby("Vehicletype")["Amount"].sum().reset_index()
+fig1 = px.bar(rev_vehicle, x="Vehicletype", y="Amount", color="Vehicletype")
+st.plotly_chart(fig1, use_container_width=True)
 
 # -----------------------------
 # Payment Status Distribution
 # -----------------------------
-if "Payment Status" in df.columns:
-    st.subheader("Payment Status Distribution")
-    pay_status = df["Payment Status"].value_counts().reset_index()
-    pay_status.columns = ["Payment Status", "Count"]
-    fig2 = px.pie(pay_status, names="Payment Status", values="Count")
-    st.plotly_chart(fig2, use_container_width=True)
+st.subheader("Payment Status Distribution")
+pay_status = df["Paymentstatus Out"].value_counts().reset_index()
+pay_status.columns = ["Paymentstatus Out", "Count"]
+fig2 = px.pie(pay_status, names="Paymentstatus Out", values="Count")
+st.plotly_chart(fig2, use_container_width=True)
 
 # -----------------------------
 # Hourly Entry Analysis
 # -----------------------------
-if "Entry Time" in df.columns:
-    df["Entry Hour"] = df["Entry Time"].dt.hour
-    entry_hourly = df["Entry Hour"].value_counts().sort_index()
+df["Entry Hour"] = df["Intime"].dt.hour
+entry_hourly = df["Entry Hour"].value_counts().sort_index()
 
-    st.subheader("Hourly Entries")
-    fig3 = px.bar(
-        x=entry_hourly.index,
-        y=entry_hourly.values,
-        labels={"x": "Hour", "y": "Entries"}
-    )
-    st.plotly_chart(fig3, use_container_width=True)
+st.subheader("Hourly Entries")
+fig3 = px.bar(
+    x=entry_hourly.index,
+    y=entry_hourly.values,
+    labels={"x": "Hour", "y": "Entries"}
+)
+st.plotly_chart(fig3, use_container_width=True)
 
-    if not entry_hourly.empty:
-        peak_hour = entry_hourly.idxmax()
-        st.success(f"Peak Entry Hour: {peak_hour}:00")
-
-# -----------------------------
-# Stay Duration Analysis
-# -----------------------------
-if "Stay Duration" in df.columns:
-    st.subheader("Stay Duration Distribution")
-    fig4 = px.histogram(df, x="Stay Duration", nbins=30)
-    st.plotly_chart(fig4, use_container_width=True)
+if not entry_hourly.empty:
+    peak_hour = entry_hourly.idxmax()
+    st.success(f"Peak Entry Hour: {peak_hour}:00")
 
 # -----------------------------
 # Daily Transactions
 # -----------------------------
-if "Entry Time" in df.columns:
-    df["Date"] = df["Entry Time"].dt.date
-    daily_transactions = df.groupby("Date").size().reset_index(name="Transactions")
+df["Date"] = df["Intime"].dt.date
+daily_transactions = df.groupby("Date").size().reset_index(name="Transactions")
 
-    st.subheader("Daily Transactions")
-    fig5 = px.line(daily_transactions, x="Date", y="Transactions")
-    st.plotly_chart(fig5, use_container_width=True)
+st.subheader("Daily Transactions")
+fig4 = px.line(daily_transactions, x="Date", y="Transactions")
+st.plotly_chart(fig4, use_container_width=True)
