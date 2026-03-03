@@ -12,6 +12,8 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+st.image("Park360 Logo.png")
+
 st.title("Parking Management Analytics Dashboard")
 
 # -----------------------------
