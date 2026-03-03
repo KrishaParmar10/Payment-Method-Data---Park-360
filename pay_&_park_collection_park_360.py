@@ -126,6 +126,24 @@ if not entry_hourly.empty:
     st.success(f"Peak Entry Hour: {peak_hour}:00")
 
 # -----------------------------
+# Hourly Exit Analysis
+# -----------------------------
+df["Exit Hour"] = df["Outtime"].dt.hour
+exit_hourly = df["Exit Hour"].value_counts().sort_index()
+
+st.subheader("🚪 Hourly Exits")
+fig_exit = px.bar(
+    x=exit_hourly.index,
+    y=exit_hourly.values,
+    labels={"x": "Hour", "y": "Exits"}
+)
+st.plotly_chart(fig_exit, use_container_width=True)
+
+if not exit_hourly.empty:
+    peak_exit_hour = exit_hourly.idxmax()
+    st.success(f"Peak Exit Hour: {peak_exit_hour}:00")
+
+# -----------------------------
 # Daily Transactions
 # -----------------------------
 df["Date"] = df["Intime"].dt.date
