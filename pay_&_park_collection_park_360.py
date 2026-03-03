@@ -94,57 +94,62 @@ col4.metric("Total Transactions", total_transactions)
 st.markdown("---")
 
 # -----------------------------
+# Side by Side Charts
+# -----------------------------
+col1, col2 = st.columns(2)
+
 # Revenue by Vehicle Type
-# -----------------------------
-st.subheader("Revenue by Vehicle Type")
-rev_vehicle = df.groupby("Vehicletype")["Amount"].sum().reset_index()
-fig1 = px.bar(rev_vehicle, x="Vehicletype", y="Amount", color="Vehicletype")
-st.plotly_chart(fig1, use_container_width=True)
+with col1:
+    st.subheader("💰 Revenue by Vehicle Type")
+    rev_vehicle = df.groupby("Vehicletype")["Amount"].sum().reset_index()
+    fig1 = px.bar(
+        rev_vehicle,
+        x="Vehicletype",
+        y="Amount",
+        color="Vehicletype"
+    )
+    st.plotly_chart(fig1, use_container_width=True)
 
-# -----------------------------
 # Payment Status Distribution
-# -----------------------------
-st.subheader("Payment Status Distribution")
-pay_status = df["Paymentstatus Out"].value_counts().reset_index()
-pay_status.columns = ["Paymentstatus Out", "Count"]
-fig2 = px.pie(pay_status, names="Paymentstatus Out", values="Count")
-st.plotly_chart(fig2, use_container_width=True)
+with col2:
+    st.subheader("💳 Payment Status Distribution")
+    pay_status = df["Paymentstatus Out"].value_counts().reset_index()
+    pay_status.columns = ["Paymentstatus Out", "Count"]
+    fig2 = px.pie(
+        pay_status,
+        names="Paymentstatus Out",
+        values="Count"
+    )
+    st.plotly_chart(fig2, use_container_width=True)
 
 # -----------------------------
-# Hourly Entry Analysis
+# Hourly Entry & Exit (Side by Side)
 # -----------------------------
+col3, col4 = st.columns(2)
+
 df["Entry Hour"] = df["Intime"].dt.hour
-entry_hourly = df["Entry Hour"].value_counts().sort_index()
-
-st.subheader("Hourly Entries")
-fig3 = px.bar(
-    x=entry_hourly.index,
-    y=entry_hourly.values,
-    labels={"x": "Hour", "y": "Entries"}
-)
-st.plotly_chart(fig3, use_container_width=True)
-
-if not entry_hourly.empty:
-    peak_hour = entry_hourly.idxmax()
-    st.success(f"Peak Entry Hour: {peak_hour}:00")
-
-# -----------------------------
-# Hourly Exit Analysis
-# -----------------------------
 df["Exit Hour"] = df["Outtime"].dt.hour
+
+entry_hourly = df["Entry Hour"].value_counts().sort_index()
 exit_hourly = df["Exit Hour"].value_counts().sort_index()
 
-st.subheader("Hourly Exits")
-fig_exit = px.bar(
-    x=exit_hourly.index,
-    y=exit_hourly.values,
-    labels={"x": "Hour", "y": "Exits"}
-)
-st.plotly_chart(fig_exit, use_container_width=True)
+with col3:
+    st.subheader("⏰ Hourly Entries")
+    fig3 = px.bar(
+        x=entry_hourly.index,
+        y=entry_hourly.values,
+        labels={"x": "Hour", "y": "Entries"}
+    )
+    st.plotly_chart(fig3, use_container_width=True)
 
-if not exit_hourly.empty:
-    peak_exit_hour = exit_hourly.idxmax()
-    st.success(f"Peak Exit Hour: {peak_exit_hour}:00")
+with col4:
+    st.subheader("🚪 Hourly Exits")
+    fig4 = px.bar(
+        x=exit_hourly.index,
+        y=exit_hourly.values,
+        labels={"x": "Hour", "y": "Exits"}
+    )
+    st.plotly_chart(fig4, use_container_width=True)
 
 # -----------------------------
 # Daily Transactions
