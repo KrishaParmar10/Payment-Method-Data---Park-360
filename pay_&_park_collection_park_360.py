@@ -5,7 +5,7 @@ import plotly.graph_objects as go
 
 st.set_page_config(page_title="Parking Analytics Dashboard", layout="wide")
 
-st.title("🚗 Parking Management Analytics Dashboard")
+st.title("Parking Management Analytics Dashboard")
 
 uploaded_file = st.file_uploader("Upload Parking Report Excel File", type=["xlsx"])
 
@@ -30,7 +30,7 @@ if "Vehicle Type" in df.columns:
 # -----------------------------
 # KPI Section
 # -----------------------------
-st.subheader("📊 Key Metrics")
+st.subheader("Key Metrics")
 
 col1, col2, col3, col4 = st.columns(4)
 
@@ -48,7 +48,7 @@ col4.metric("Total Transactions", total_transactions)
 # Revenue by Vehicle Type
 # -----------------------------
 if "Vehicle Type" in df.columns:
-    st.subheader("💰 Revenue by Vehicle Type")
+    st.subheader("Revenue by Vehicle Type")
     rev_vehicle = df.groupby("Vehicle Type")["Total Amount"].sum().reset_index()
     fig1 = px.bar(rev_vehicle, x="Vehicle Type", y="Total Amount", color="Vehicle Type")
     st.plotly_chart(fig1, use_container_width=True)
@@ -57,7 +57,7 @@ if "Vehicle Type" in df.columns:
 # Payment Status Counts
 # -----------------------------
 if "Payment Status" in df.columns:
-    st.subheader("💳 Payment Status Distribution")
+    st.subheader("Payment Status Distribution")
     pay_status = df["Payment Status"].value_counts().reset_index()
     pay_status.columns = ["Payment Status", "Count"]
     fig2 = px.pie(pay_status, names="Payment Status", values="Count")
@@ -77,7 +77,7 @@ if "Entry Time" in df.columns and "Exit Time" in df.columns:
     entry_hourly = df["Entry Hour"].value_counts().sort_index()
     exit_hourly = df["Exit Hour"].value_counts().sort_index()
 
-    st.subheader("⏰ Hourly Entry & Exit Count")
+    st.subheader("Hourly Entry & Exit Count")
 
     col1, col2 = st.columns(2)
 
@@ -109,7 +109,7 @@ if "Entry Time" in df.columns and "Exit Time" in df.columns:
 # Stay Duration Analysis
 # -----------------------------
 if "Stay Duration" in df.columns:
-    st.subheader("🕒 Stay Duration Distribution")
+    st.subheader("Stay Duration Distribution")
     fig5 = px.histogram(df, x="Stay Duration", nbins=30)
     st.plotly_chart(fig5, use_container_width=True)
 
@@ -117,7 +117,7 @@ if "Stay Duration" in df.columns:
 # Average Duration by Vehicle Type
 # -----------------------------
 if "Vehicle Type" in df.columns and "Stay Duration" in df.columns:
-    st.subheader("📈 Average Duration by Vehicle Type")
+    st.subheader("Average Duration by Vehicle Type")
     avg_duration = df.groupby("Vehicle Type")["Stay Duration"].mean().reset_index()
     fig6 = px.bar(avg_duration, x="Vehicle Type", y="Stay Duration", color="Vehicle Type")
     st.plotly_chart(fig6, use_container_width=True)
@@ -129,7 +129,7 @@ if "Entry Time" in df.columns:
     df["Date"] = df["Entry Time"].dt.date
     daily_transactions = df.groupby("Date").size().reset_index(name="Transactions")
 
-    st.subheader("📅 Total Transactions Per Day")
+    st.subheader("Total Transactions Per Day")
     fig7 = px.line(daily_transactions, x="Date", y="Transactions")
     st.plotly_chart(fig7, use_container_width=True)
 
