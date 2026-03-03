@@ -5,6 +5,13 @@ import plotly.express as px
 # -----------------------------
 # Page Config
 # -----------------------------
+
+col1, col2, col3 = st.columns([1,2,1])
+
+with col2:
+    st.image("Park360_Logo.png", width=250)
+
+
 st.set_page_config(
     page_title="Parking Analytics Dashboard",
     layout="wide",
