@@ -38,17 +38,17 @@ if "Vehicle Type" in df.columns:
 
 # Payment Status Filter
 if "Payment Status" in df.columns:
-    payment_options = df["Payment Status"].dropna().unique()
+    payment_options = df["Paymentstatus Out"].dropna().unique()
     selected_payment = st.sidebar.multiselect(
         "Select Payment Status",
         options=payment_options,
         default=payment_options
     )
-    df = df[df["Payment Status"].isin(selected_payment)]
+    df = df[df["Paymentstatus Out"].isin(selected_payment)]
 
 # Date Filter
 if "Entry Time" in df.columns:
-    df["Entry Time"] = pd.to_datetime(df["Entry Time"], errors="coerce")
+    df["Entry Time"] = pd.to_datetime(df["Intime"], errors="coerce")
     min_date = df["Entry Time"].min()
     max_date = df["Entry Time"].max()
 
