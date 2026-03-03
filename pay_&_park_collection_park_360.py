@@ -131,7 +131,7 @@ if not entry_hourly.empty:
 df["Exit Hour"] = df["Outtime"].dt.hour
 exit_hourly = df["Exit Hour"].value_counts().sort_index()
 
-st.subheader("🚪 Hourly Exits")
+st.subheader("Hourly Exits")
 fig_exit = px.bar(
     x=exit_hourly.index,
     y=exit_hourly.values,
