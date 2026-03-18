@@ -198,42 +198,80 @@ st.write("### Variance from Average")
 st.dataframe(daily)
 
 
-# OPERATOR PERFORMANCE
+# OPERATOR PERFORMANCE (ADVANCED)
 
-if "Operator" in df.columns:
+st.header("Operator Performance")
 
-    st.header("Operator Performance")
+# Clean column names
+df.columns = df.columns.str.strip()
 
-    operator_perf = df.groupby("Operator")["Amount"].sum().reset_index()
-    operator_perf = operator_perf.sort_values(by="Amount", ascending=False)
+# Auto-detect columns (flexible matching)
+operator_col = [col for col in df.columns if "operator" in col.lower()]
+amount_col = [col for col in df.columns if "amount" in col.lower()]
+payment_col = [col for col in df.columns if "payment" in col.lower()]
 
-    fig = px.bar(operator_perf, x="Operator", y="Amount",
-                 title="Operator Revenue Ranking")
+# Check if required columns exist
+if not operator_col or not amount_col:
+    st.error("Operator or Amount column not found in your data")
+else:
+    operator_col = operator_col[0]
+    amount_col = amount_col[0]
+
+    # Ensure date exists
+    df["Date"] = pd.to_datetime(df["Entry Time"]).dt.date
+
+    # -----------------------------
+    # CONSISTENCY PERFORMANCE
+    # -----------------------------
+    daily_operator = df.groupby([operator_col, "Date"])[amount_col].sum().reset_index()
+
+    # Calculate consistency metrics
+    perf = daily_operator.groupby(operator_col).agg(
+        Avg_Daily_Revenue=(amount_col, "mean"),
+        Std_Dev=(amount_col, "std"),
+        Total_Revenue=(amount_col, "sum")
+    ).reset_index()
+
+    # Lower std deviation = more consistent
+    perf["Consistency Score"] = perf["Avg_Daily_Revenue"] / (perf["Std_Dev"] + 1)
+
+    perf = perf.sort_values(by="Consistency Score", ascending=False)
+
+    st.subheader("🏆 Operator Ranking (Consistency Based)")
+    st.dataframe(perf)
+
+    fig = px.bar(perf, x=operator_col, y="Consistency Score",
+                 title="Operator Consistency Ranking")
     st.plotly_chart(fig, use_container_width=True)
 
-    # Payment split
-    if "Payment Mode" in df.columns:
-        pay_split = df.groupby(["Operator", "Payment Mode"]).size().reset_index(name="Count")
+    # -----------------------------
+    # PAYMENT BEHAVIOR
+    # -----------------------------
+    if payment_col:
+        payment_col = payment_col[0]
 
-        fig = px.bar(pay_split, x="Operator", y="Count", color="Payment Mode",
-                     title="Operator Payment Mode Distribution")
-        st.plotly_chart(fig, use_container_width=True)
+        # Categorize Digital vs Cash
+        df["Payment Type"] = df[payment_col].apply(
+            lambda x: "Digital" if str(x).lower() in ["upi", "card"] else "Cash"
+        )
 
+        pay_analysis = df.groupby([operator_col, "Payment Type"]).size().reset_index(name="Count")
 
-# PAYMENT MODE INSIGHTS
+        st.subheader("💳 Operator Payment Behavior")
 
-if "Payment Mode" in df.columns:
+        fig2 = px.bar(pay_analysis, x=operator_col, y="Count",
+                      color="Payment Type",
+                      title="Cash vs Digital Collection by Operator")
+        st.plotly_chart(fig2, use_container_width=True)
 
-    st.header("Payment Mode Insights")
+        # Digital % per operator
+        digital = df[df["Payment Type"] == "Digital"].groupby(operator_col).size()
+        total = df.groupby(operator_col).size()
 
-    pay_trend = df.groupby(["Date", "Payment Mode"]).size().reset_index(name="Count")
+        digital_percent = (digital / total * 100).fillna(0).reset_index(name="Digital %")
 
-    fig = px.line(pay_trend, x="Date", y="Count", color="Payment Mode",
-                  title="Payment Mode Trend")
-    st.plotly_chart(fig, use_container_width=True)
+        st.subheader("📊 Digital Adoption by Operator")
+        st.dataframe(digital_percent.sort_values(by="Digital %", ascending=False))
 
-    # Digital Adoption
-    digital = df[df["Payment Mode"].isin(["UPI", "Card"])]
-    digital_percent = (len(digital) / len(df)) * 100
-
-    st.metric("Digital Adoption %", f"{digital_percent:.2f}%")
+    else:
+        st.warning("Payment Mode column not found — skipping payment analysis")
