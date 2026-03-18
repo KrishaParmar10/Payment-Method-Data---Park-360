@@ -197,13 +197,34 @@ st.plotly_chart(fig, use_container_width=True)
 st.write("### Variance from Average")
 st.dataframe(daily)
 
-st.header("Vehicle Type Performance (Consistency)")
+st.header("Vehicle Type Consistency")
 
-df["Entry Time"] = pd.to_datetime(df["Intime"])
-df["Date"] = df["Intime"].dt.date
+# Clean columns
+df.columns = df.columns.str.strip()
 
-group_col = "Vehicle Type"
-amount_col = "Amount"
+# -------- AUTO DETECT COLUMNS --------
+group_col = None
+amount_col = None
+date_col = None
+
+for col in df.columns:
+    c = col.lower()
+    if "vehicle" in c:
+        group_col = col
+    elif "amount" in c:
+        amount_col = col
+    elif "entry" in c or "date" in c:
+        date_col = col
+
+# -------- VALIDATION --------
+if group_col is None or amount_col is None or date_col is None:
+    st.error("Required columns not found")
+    st.write("Your columns:", df.columns)
+    st.stop()
+
+# -------- PROCESS --------
+df[date_col] = pd.to_datetime(df[date_col])
+df["Date"] = df[date_col].dt.date
 
 daily = df.groupby([group_col, "Date"])[amount_col].sum().reset_index()
 
