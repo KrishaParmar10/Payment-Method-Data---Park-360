@@ -206,7 +206,7 @@ daily = df.groupby("Date")["Amount"].sum().reset_index()
 daily["Average"] = daily["Amount"].mean()
 daily["Variance"] = daily["Amount"] - daily["Average"]
 
-fig = px.line(daily, x="Date", y="Total Amount", title="Daily Revenue Trend")
+fig = px.line(daily, x="Date", y="Amount", title="Daily Revenue Trend")
 st.plotly_chart(fig, use_container_width=True)
 
 st.write("### Variance from Average")
