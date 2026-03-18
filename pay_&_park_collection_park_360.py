@@ -160,3 +160,95 @@ daily_transactions = df.groupby("Date").size().reset_index(name="Transactions")
 st.subheader("Daily Transactions")
 fig4 = px.line(daily_transactions, x="Date", y="Transactions")
 st.plotly_chart(fig4, use_container_width=True)
+
+
+# Convert Date & Time
+
+df["Entry Time"] = pd.to_datetime(df["Entry Time"])
+df["Exit Time"] = pd.to_datetime(df["Exit Time"])
+
+df["Date"] = df["Entry Time"].dt.date
+df["Hour"] = df["Entry Time"].dt.hour
+df["Day"] = df["Entry Time"].dt.day_name()
+
+
+
+# INTIME / OUTTIME ANALYSIS
+
+st.header("Intime / Outtime Analysis")
+
+col1, col2 = st.columns(2)
+
+entry_hour = df.groupby("Hour").size().reset_index(name="Entries")
+
+with col1:
+    fig = px.bar(entry_hour, x="Hour", y="Entries", title="Entries per Hour")
+    st.plotly_chart(fig, use_container_width=True)
+
+peak_hour = entry_hour.loc[entry_hour["Entries"].idxmax(), "Hour"]
+st.success(f"Peak Entry Hour: {peak_hour}:00")
+
+# Weekday vs Weekend
+df["Type"] = df["Day"].apply(lambda x: "Weekend" if x in ["Saturday", "Sunday"] else "Weekday")
+
+weekday_data = df.groupby(["Hour", "Type"]).size().reset_index(name="Count")
+
+fig = px.line(weekday_data, x="Hour", y="Count", color="Type",
+              title="Weekday vs Weekend Traffic")
+st.plotly_chart(fig, use_container_width=True)
+
+
+# 7-DAY TREND ANALYSIS
+
+st.header("7-Day Trend Analysis")
+
+daily = df.groupby("Date")["Total Amount"].sum().reset_index()
+daily["Average"] = daily["Total Amount"].mean()
+daily["Variance"] = daily["Total Amount"] - daily["Average"]
+
+fig = px.line(daily, x="Date", y="Total Amount", title="Daily Revenue Trend")
+st.plotly_chart(fig, use_container_width=True)
+
+st.write("### Variance from Average")
+st.dataframe(daily)
+
+
+# OPERATOR PERFORMANCE
+
+if "Operator" in df.columns:
+
+    st.header("Operator Performance")
+
+    operator_perf = df.groupby("Operator")["Total Amount"].sum().reset_index()
+    operator_perf = operator_perf.sort_values(by="Total Amount", ascending=False)
+
+    fig = px.bar(operator_perf, x="Operator", y="Total Amount",
+                 title="Operator Revenue Ranking")
+    st.plotly_chart(fig, use_container_width=True)
+
+    # Payment split
+    if "Payment Mode" in df.columns:
+        pay_split = df.groupby(["Operator", "Payment Mode"]).size().reset_index(name="Count")
+
+        fig = px.bar(pay_split, x="Operator", y="Count", color="Payment Mode",
+                     title="Operator Payment Mode Distribution")
+        st.plotly_chart(fig, use_container_width=True)
+
+
+# PAYMENT MODE INSIGHTS
+
+if "Payment Mode" in df.columns:
+
+    st.header("Payment Mode Insights")
+
+    pay_trend = df.groupby(["Date", "Payment Mode"]).size().reset_index(name="Count")
+
+    fig = px.line(pay_trend, x="Date", y="Count", color="Payment Mode",
+                  title="Payment Mode Trend")
+    st.plotly_chart(fig, use_container_width=True)
+
+    # Digital Adoption
+    digital = df[df["Payment Mode"].isin(["UPI", "Card"])]
+    digital_percent = (len(digital) / len(df)) * 100
+
+    st.metric("Digital Adoption %", f"{digital_percent:.2f}%")
