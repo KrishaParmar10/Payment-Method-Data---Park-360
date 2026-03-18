@@ -173,21 +173,6 @@ df["Day"] = df["Entry Time"].dt.day_name()
 
 
 
-# INTIME / OUTTIME ANALYSIS
-
-st.header("Intime / Outtime Analysis")
-
-col1, col2 = st.columns(2)
-
-entry_hour = df.groupby("Hour").size().reset_index(name="Entries")
-
-with col1:
-    fig = px.bar(entry_hour, x="Hour", y="Entries", title="Entries per Hour")
-    st.plotly_chart(fig, use_container_width=True)
-
-peak_hour = entry_hour.loc[entry_hour["Entries"].idxmax(), "Hour"]
-st.success(f"Peak Entry Hour: {peak_hour}:00")
-
 # Weekday vs Weekend
 df["Type"] = df["Day"].apply(lambda x: "Weekend" if x in ["Saturday", "Sunday"] else "Weekday")
 
@@ -214,9 +199,6 @@ st.dataframe(daily)
 
 
 # OPERATOR PERFORMANCE
-
-st.write(df.columns)
-Index(['Operator Name', 'Payment Mode', 'Amount', ...], dtype='object')
 
 if "Operator" in df.columns:
 
