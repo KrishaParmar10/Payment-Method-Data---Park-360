@@ -202,9 +202,9 @@ st.plotly_chart(fig, use_container_width=True)
 
 st.header("7-Day Trend Analysis")
 
-daily = df.groupby("Date")["Total Amount"].sum().reset_index()
-daily["Average"] = daily["Total Amount"].mean()
-daily["Variance"] = daily["Total Amount"] - daily["Average"]
+daily = df.groupby("Date")["Amount"].sum().reset_index()
+daily["Average"] = daily["Amount"].mean()
+daily["Variance"] = daily["Amount"] - daily["Average"]
 
 fig = px.line(daily, x="Date", y="Total Amount", title="Daily Revenue Trend")
 st.plotly_chart(fig, use_container_width=True)
