@@ -219,10 +219,10 @@ if "Operator" in df.columns:
 
     st.header("Operator Performance")
 
-    operator_perf = df.groupby("Operator")["Total Amount"].sum().reset_index()
-    operator_perf = operator_perf.sort_values(by="Total Amount", ascending=False)
+    operator_perf = df.groupby("Operator")["Amount"].sum().reset_index()
+    operator_perf = operator_perf.sort_values(by="Amount", ascending=False)
 
-    fig = px.bar(operator_perf, x="Operator", y="Total Amount",
+    fig = px.bar(operator_perf, x="Operator", y="Amount",
                  title="Operator Revenue Ranking")
     st.plotly_chart(fig, use_container_width=True)
 
