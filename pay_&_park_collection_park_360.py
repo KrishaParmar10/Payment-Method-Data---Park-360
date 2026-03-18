@@ -164,8 +164,8 @@ st.plotly_chart(fig4, use_container_width=True)
 
 # Convert Date & Time
 
-df["Entry Time"] = pd.to_datetime(df["Entry Time"])
-df["Exit Time"] = pd.to_datetime(df["Exit Time"])
+df["Entry Time"] = pd.to_datetime(df["Intime"])
+df["Exit Time"] = pd.to_datetime(df["Outtime"])
 
 df["Date"] = df["Entry Time"].dt.date
 df["Hour"] = df["Entry Time"].dt.hour
