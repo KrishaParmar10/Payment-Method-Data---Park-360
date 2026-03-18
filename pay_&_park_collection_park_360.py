@@ -215,6 +215,9 @@ st.dataframe(daily)
 
 # OPERATOR PERFORMANCE
 
+st.write(df.columns)
+Index(['Operator Name', 'Payment Mode', 'Amount', ...], dtype='object')
+
 if "Operator" in df.columns:
 
     st.header("Operator Performance")
