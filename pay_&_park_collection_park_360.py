@@ -197,100 +197,19 @@ st.plotly_chart(fig, use_container_width=True)
 st.write("### Variance from Average")
 st.dataframe(daily)
 
+st.header("Vehicle Type Performance (Consistency)")
 
-st.header("Operator Performance")
+df["Entry Time"] = pd.to_datetime(df["Intime"])
+df["Date"] = df["Intime"].dt.date
 
-# Clean column names
-df.columns = df.columns.str.strip()
+group_col = "Vehicle Type"
+amount_col = "Amount"
 
-# --------- AUTO DETECT COLUMN NAMES ----------
-operator_col = None
-amount_col = None
-payment_col = None
-date_col = None
+daily = df.groupby([group_col, "Date"])[amount_col].sum().reset_index()
 
-for col in df.columns:
-    if "operator" in col.lower():
-        operator_col = col
-    if "amount" in col.lower():
-        amount_col = col
-    if "payment" in col.lower() or "mode" in col.lower():
-        payment_col = col
-    if "entry" in col.lower() or "date" in col.lower():
-        date_col = col
+consistency = daily.groupby(group_col)[amount_col].agg(["mean", "std"]).reset_index()
+consistency["Score"] = consistency["mean"] / (consistency["std"] + 1)
 
-# --------- VALIDATION ----------
-if operator_col is None or amount_col is None:
-    st.error("Operator or Amount column not found in your data")
-    st.stop()
+consistency = consistency.sort_values(by="Score", ascending=False)
 
-# Convert date
-df[date_col] = pd.to_datetime(df[date_col])
-df["Date"] = df[date_col].dt.date
-
-# --------- CONSISTENCY CALCULATION ----------
-# Daily revenue per operator
-daily_op = df.groupby([operator_col, "Date"])[amount_col].sum().reset_index()
-
-# Mean + Std deviation (consistency)
-consistency = daily_op.groupby(operator_col)[amount_col].agg(["mean", "std"]).reset_index()
-
-# Lower std = more consistent
-consistency["Consistency Score"] = consistency["mean"] / (consistency["std"] + 1)
-
-consistency = consistency.sort_values(by="Consistency Score", ascending=False)
-
-st.subheader("Operator Consistency Ranking")
 st.dataframe(consistency)
-
-# --------- VISUAL ----------
-import plotly.express as px
-
-fig = px.bar(consistency,
-             x=operator_col,
-             y="Consistency Score",
-             title="Operator Consistency Ranking",
-             color="Consistency Score")
-
-st.plotly_chart(fig, use_container_width=True)
-
-# --------- PAYMENT BEHAVIOR ----------
-if payment_col:
-
-    st.subheader("Payment Behavior by Operator")
-
-    pay = df.groupby([operator_col, payment_col]).size().reset_index(name="Count")
-
-    fig2 = px.bar(pay,
-                  x=operator_col,
-                  y="Count",
-                  color=payment_col,
-                  title="Cash vs Digital by Operator")
-
-    st.plotly_chart(fig2, use_container_width=True)
-
-    # --------- DIGITAL vs CASH SUMMARY ----------
-    digital_keywords = ["upi", "card", "online"]
-    
-    df["Payment_Type"] = df[payment_col].astype(str).str.lower().apply(
-        lambda x: "Digital" if any(k in x for k in digital_keywords) else "Cash"
-    )
-
-    summary = df.groupby([operator_col, "Payment_Type"]).size().reset_index(name="Count")
-
-    pivot = summary.pivot(index=operator_col, columns="Payment_Type", values="Count").fillna(0)
-
-    st.subheader("Digital vs Cash Summary")
-    st.dataframe(pivot)
-
-    # Highlight top performers
-    if "Digital" in pivot.columns:
-        top_digital = pivot["Digital"].idxmax()
-        st.success(f"Top Digital Driver: {top_digital}")
-
-    if "Cash" in pivot.columns:
-        top_cash = pivot["Cash"].idxmax()
-        st.warning(f"Highest Cash Collector: {top_cash}")
-
-else:
-    st.warning("Payment Mode column not found")
