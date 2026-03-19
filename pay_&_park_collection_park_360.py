@@ -182,9 +182,6 @@ df["Day"] = df["Entry Time"].dt.day_name()
 
 
 
-    # Standardise column names
-    df.columns = df.columns.str.strip()
-
     # Parse datetimes
     for col in ["Intime", "Outtime"]:
         if col in df.columns:
