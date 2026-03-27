@@ -206,7 +206,7 @@ st.markdown("---")
 # ═══════════════════════════════════════════════════════════════
 #  NEW CONDITION 1 — INTIME / OUTTIME ANALYSIS
 # ═══════════════════════════════════════════════════════════════
-st.markdown('<div class="section-header">📍 Condition 1 · Intime / Outtime Analysis</div>', unsafe_allow_html=True)
+st.markdown('<div class="section-header"> Intime / Outtime Analysis</div>', unsafe_allow_html=True)
 
 c1a, c1b = st.columns(2)
 
@@ -271,7 +271,7 @@ st.markdown("---")
 # ═══════════════════════════════════════════════════════════════
 #  NEW CONDITION 2 — 7-DAY TREND ANALYSIS
 # ═══════════════════════════════════════════════════════════════
-st.markdown('<div class="section-header">📈 Condition 2 · 7-Day Trend Analysis</div>', unsafe_allow_html=True)
+st.markdown('<div class="section-header"> 7-Day Trend Analysis</div>', unsafe_allow_html=True)
 
 daily = (
     df.groupby("Date")
@@ -377,7 +377,7 @@ st.markdown("---")
 # ═══════════════════════════════════════════════════════════════
 #  NEW CONDITION 3 — DAY-WISE PERFORMANCE
 # ═══════════════════════════════════════════════════════════════
-st.markdown('<div class="section-header">📅 Condition 3 · Day-wise Performance</div>', unsafe_allow_html=True)
+st.markdown('<div class="section-header"> Day-wise Performance</div>', unsafe_allow_html=True)
 
 dw = (
     df.groupby(["Date", "DayOfWeek"])
@@ -459,7 +459,7 @@ st.markdown("---")
 # ═══════════════════════════════════════════════════════════════
 #  NEW CONDITION 4 — OPERATOR PERFORMANCE
 # ═══════════════════════════════════════════════════════════════
-st.markdown('<div class="section-header">👤 Condition 4 · Operator Performance</div>', unsafe_allow_html=True)
+st.markdown('<div class="section-header"> Operator Performance</div>', unsafe_allow_html=True)
 
 if "Operator" not in df.columns:
     st.info("Operator column (Extra Inuser) not found in data.")
@@ -571,7 +571,7 @@ st.markdown("---")
 # ═══════════════════════════════════════════════════════════════
 #  NEW CONDITION 5 — PAYMENT MODE INSIGHTS
 # ═══════════════════════════════════════════════════════════════
-st.markdown('<div class="section-header">💳 Condition 5 · Payment Mode Insights</div>', unsafe_allow_html=True)
+st.markdown('<div class="section-header"> Payment Mode Insights</div>', unsafe_allow_html=True)
 
 # Daily mode trend
 daily_mode = (
